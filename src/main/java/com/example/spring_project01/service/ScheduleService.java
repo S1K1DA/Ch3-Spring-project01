@@ -1,6 +1,7 @@
 package com.example.spring_project01.service;
 
 import com.example.spring_project01.dto.request.ScheduleCreateRequest;
+import com.example.spring_project01.dto.request.ScheduleUpdateRequest;
 import com.example.spring_project01.dto.response.ScheduleCreateResponse;
 import com.example.spring_project01.dto.response.ScheduleResponse;
 import com.example.spring_project01.entity.Schedule;
@@ -70,6 +71,29 @@ public class ScheduleService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
 
         // Entity -> Response DTO 변환
+        return new ScheduleResponse(
+                schedule.getId(),
+                schedule.getTitle(),
+                schedule.getContent(),
+                schedule.getAuthor(),
+                schedule.getCreatedAt(),
+                schedule.getModifiedAt()
+        );
+    }
+
+    @Transactional
+    public ScheduleResponse updateSchedule(Long id, ScheduleUpdateRequest request) {
+        // 일정 조회
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+
+        // 비밀번호 검증
+        if(!schedule.getPassword().equals(request.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+        }
+        // 일정 수정
+        schedule.update(request.getTitle(), request.getAuthor());
+
         return new ScheduleResponse(
                 schedule.getId(),
                 schedule.getTitle(),

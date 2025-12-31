@@ -46,4 +46,10 @@ public class Schedule {
         this.author = author;
         this.password = password;
     }
+
+    // 일정 수정(제목, 작성자)
+    public void update(String title, String author) {
+        this.title = title;
+        this.author = author;
+    }
 }
