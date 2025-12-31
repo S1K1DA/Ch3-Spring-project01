@@ -62,4 +62,21 @@ public class ScheduleService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public ScheduleResponse getSchedule(Long id) {
+        // 일정 ID로 단건 조회 (존재하지 않으면 예외 발생)
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+
+        // Entity -> Response DTO 변환
+        return new ScheduleResponse(
+                schedule.getId(),
+                schedule.getTitle(),
+                schedule.getContent(),
+                schedule.getAuthor(),
+                schedule.getCreatedAt(),
+                schedule.getModifiedAt()
+        );
+    }
 }
