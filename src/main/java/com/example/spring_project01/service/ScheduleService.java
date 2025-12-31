@@ -67,25 +67,16 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public ScheduleResponse getSchedule(Long id) {
         // 일정 ID로 단건 조회 (존재하지 않으면 예외 발생)
-        Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+        Schedule schedule = findScheduleById(id);
 
         // Entity -> Response DTO 변환
-        return new ScheduleResponse(
-                schedule.getId(),
-                schedule.getTitle(),
-                schedule.getContent(),
-                schedule.getAuthor(),
-                schedule.getCreatedAt(),
-                schedule.getModifiedAt()
-        );
+        return toResponse(schedule);
     }
 
     @Transactional
     public ScheduleResponse updateSchedule(Long id, ScheduleUpdateRequest request) {
         // 일정 조회
-        Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+        Schedule schedule = findScheduleById(id);
 
         // 비밀번호 검증
         if(!schedule.getPassword().equals(request.getPassword())) {
@@ -94,6 +85,11 @@ public class ScheduleService {
         // 일정 수정
         schedule.update(request.getTitle(), request.getAuthor());
 
+        return toResponse(schedule);
+    }
+
+    // 요구사항에는 없지만 Entity -> Response변환 메서드
+    private ScheduleResponse toResponse(Schedule schedule) {
         return new ScheduleResponse(
                 schedule.getId(),
                 schedule.getTitle(),
@@ -103,4 +99,10 @@ public class ScheduleService {
                 schedule.getModifiedAt()
         );
     }
+
+    private Schedule findScheduleById(Long id) {
+        return scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));
+    }
+
 }
