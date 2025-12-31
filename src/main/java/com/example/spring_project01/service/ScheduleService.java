@@ -3,7 +3,9 @@ package com.example.spring_project01.service;
 import com.example.spring_project01.dto.request.ScheduleCreateRequest;
 import com.example.spring_project01.dto.request.ScheduleDeleteRequest;
 import com.example.spring_project01.dto.request.ScheduleUpdateRequest;
+import com.example.spring_project01.dto.response.CommentResponse;
 import com.example.spring_project01.dto.response.ScheduleCreateResponse;
+import com.example.spring_project01.dto.response.ScheduleDetailResponse;
 import com.example.spring_project01.dto.response.ScheduleResponse;
 import com.example.spring_project01.entity.Schedule;
 import com.example.spring_project01.repository.ScheduleRepository;
@@ -99,6 +101,33 @@ public class ScheduleService {
 
         // 일정 삭제
         scheduleRepository.delete(schedule);
+    }
+
+    // 단건조회 (댓글 포함)
+    @Transactional(readOnly = true)
+    public ScheduleDetailResponse getScheduleDetail(Long id) {
+
+        Schedule schedule = findScheduleById(id);
+
+        List<CommentResponse> comments = schedule.getComments().stream()
+                .map(comment -> new CommentResponse(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getAuthor(),
+                        comment.getCreatedAt(),
+                        comment.getModifiedAt()
+                ))
+                .toList();
+
+        return new ScheduleDetailResponse(
+                schedule.getId(),
+                schedule.getTitle(),
+                schedule.getContent(),
+                schedule.getAuthor(),
+                schedule.getCreatedAt(),
+                schedule.getModifiedAt(),
+                comments
+        );
     }
 
     // Service 공통 조회 및 응답 변환 로직 분리
