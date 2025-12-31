@@ -1,6 +1,7 @@
 package com.example.spring_project01.service;
 
 import com.example.spring_project01.dto.request.ScheduleCreateRequest;
+import com.example.spring_project01.dto.request.ScheduleDeleteRequest;
 import com.example.spring_project01.dto.request.ScheduleUpdateRequest;
 import com.example.spring_project01.dto.response.ScheduleCreateResponse;
 import com.example.spring_project01.dto.response.ScheduleResponse;
@@ -88,7 +89,19 @@ public class ScheduleService {
         return toResponse(schedule);
     }
 
-    // 요구사항에는 없지만 Entity -> Response변환 메서드
+    @Transactional
+    public void deleteSchedule(Long id, ScheduleDeleteRequest request) {
+        Schedule schedule = findScheduleById(id);
+
+        if(!schedule.getPassword().equals(request.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+        }
+
+        // 일정 삭제
+        scheduleRepository.delete(schedule);
+    }
+
+    // Service 공통 조회 및 응답 변환 로직 분리
     private ScheduleResponse toResponse(Schedule schedule) {
         return new ScheduleResponse(
                 schedule.getId(),
@@ -99,7 +112,6 @@ public class ScheduleService {
                 schedule.getModifiedAt()
         );
     }
-
     private Schedule findScheduleById(Long id) {
         return scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 일정이 없습니다."));

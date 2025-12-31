@@ -1,6 +1,7 @@
 package com.example.spring_project01.controller;
 
 import com.example.spring_project01.dto.request.ScheduleCreateRequest;
+import com.example.spring_project01.dto.request.ScheduleDeleteRequest;
 import com.example.spring_project01.dto.request.ScheduleUpdateRequest;
 import com.example.spring_project01.dto.response.ScheduleCreateResponse;
 import com.example.spring_project01.dto.response.ScheduleResponse;
@@ -39,5 +40,12 @@ public class ScheduleController {
     @PutMapping("/schedules/{id}")
     public ScheduleResponse updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateRequest request) {
         return scheduleService.updateSchedule(id, request);
+    }
+
+    // 일정 삭제
+    @DeleteMapping("/schedules/{id}")
+    public String deleteSchedule(@PathVariable Long id, @RequestBody ScheduleDeleteRequest request) {
+        scheduleService.deleteSchedule(id, request);
+        return "삭제 완료";
     }
 }
