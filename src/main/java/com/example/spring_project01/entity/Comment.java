@@ -9,24 +9,19 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "schedules")
+@Table(name = "comments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Schedule {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String title;
-
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 300)
     private String content;
 
     @Column(nullable = false)
@@ -35,6 +30,11 @@ public class Schedule {
     @Column(nullable = false)
     private String password;
 
+    // 댓글은 반드시 하나의 일정(다대일 관계)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -42,20 +42,11 @@ public class Schedule {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
-    public Schedule(String title, String content, String author, String password) {
-        this.title = title;
+    public Comment(String content, String author, String password, Schedule schedule) {
         this.content = content;
         this.author = author;
         this.password = password;
+        this.schedule = schedule;
     }
 
-    // 일정 수정(제목, 작성자)
-    public void update(String title, String author) {
-        this.title = title;
-        this.author = author;
-    }
-
-    // 하나의 일정에 여러 개의 댓글 매핑(일대다)
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
 }
